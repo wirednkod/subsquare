@@ -1,5 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit";
 import getChainSettings from "../../utils/consts/settings";
+import getEndpointFromLocalStorage from "next-common/services/chain/apis/endpointLocalStorage";
 
 const chain = process.env.NEXT_PUBLIC_CHAIN;
 
@@ -92,6 +93,20 @@ const nodeSlice = createSlice({
 export const currentNodeSelector = (state) => state.node?.currentNode;
 export const nodesSelector = (state) => state.node?.nodes;
 export const nodesHeightSelector = (state) => state.node?.nodesHeight;
+
+export const initCandidateNodesSelector = (state) => {
+  const nodes = state.node?.nodes;
+  const savedEndpoint = getEndpointFromLocalStorage(chain);
+  const chainNodes = nodes.map((item) => item.url);
+
+  const first3Nodes = chainNodes.slice(0, 3);
+  const candidates = new Set(first3Nodes);
+  if (savedEndpoint && chainNodes.includes(savedEndpoint)) {
+    candidates.add(savedEndpoint);
+  }
+
+  return [...candidates];
+};
 
 export const {
   setCurrentNode,
